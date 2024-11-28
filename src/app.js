@@ -12,12 +12,28 @@ const app=express();
 const {adminAuth}=require('./middlewares/auth')
 const {userAuth}=require('./middlewares/auth')
 
-app.use('/admin',adminAuth);
 
+app.use('/',(err,req,res,next)=>{
+    
+    if(err){
+        console.log(err);
+        res.status(500).send("something went wrong!!!");
+    }
+    next();
+    
+});
+app.use('/admin',adminAuth);
 
 app.get('/user',userAuth,(req,res)=>{
 
-    res.send("Welcome to the user page!!!");
+    try{
+
+        throw new Error("This is an");
+        res.send("Welcome to the user page!!!");
+    }
+    catch(err){
+        res.status(500).send("Something went wrong contact support team!!!");
+    }
 
 });
 
@@ -32,6 +48,8 @@ app.post('/admin/addUser',(req,res)=>{
 app.delete('/admin/deleteUser',(req,res)=>{
     res.send("User deleted successfully!!!");
 });
+
+
 
 app.listen(8000,()=>{
     console.log("listening on port",8000);
