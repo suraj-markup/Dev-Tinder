@@ -1,5 +1,6 @@
 const express=require('express');
-
+const connectDB=require('./config/database');
+const {User}=require('./model/user');
 /*
 
 app.use -> matches all the HTTP method API calls to /test
@@ -9,48 +10,36 @@ app.get -> matches only the GET HTTP method API call to /test
 
 const app=express();
 
-const {adminAuth}=require('./middlewares/auth')
-const {userAuth}=require('./middlewares/auth')
-
-
-app.use('/',(err,req,res,next)=>{
-    
-    if(err){
-        console.log(err);
-        res.status(500).send("something went wrong!!!");
+app.post('/signup',async (req,res)=>{
+    const userObj={
+        firstName:"Rajneesh",
+        lastName:"yadav",
+        emailId:"rajneesh65@gmail.com",
+        password:"Password",
+        age:18,
+        gender:"Male",
     }
-    next();
     
-});
-app.use('/admin',adminAuth);
-
-app.get('/user',userAuth,(req,res)=>{
-
-    try{
-
-        throw new Error("This is an");
-        res.send("Welcome to the user page!!!");
+    const user=new User(userObj);
+    try{ 
+        await user.save();
+        res.status(200).send(user);
     }
     catch(err){
-        res.status(500).send("Something went wrong contact support team!!!");
+        res.status(400).send("Error in creating user!!!");
     }
-
-});
-
-app.get('/admin/dashboard',(req,res)=>{
-    res.send("Welcome to the dashboard Admin!!!");
 })
 
-app.post('/admin/addUser',(req,res)=>{
-    res.send("User added successfully!!!");
-});
+connectDB()
+    .then(()=>{
+        app.listen(8000,()=>{
+            console.log("listening on port",8000);
+        })
+         console.log("Database is connected Successfully!!!");
+    })
+    .catch((err)=>{
+        console.log("Error in connecting to the Database!!!");
+        console.log(err);
+    });
 
-app.delete('/admin/deleteUser',(req,res)=>{
-    res.send("User deleted successfully!!!");
-});
 
-
-
-app.listen(8000,()=>{
-    console.log("listening on port",8000);
-})
