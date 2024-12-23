@@ -3,9 +3,15 @@ const connectDB=require('./config/database');
 const {User}=require('./model/user');
 const {validateSignup}=require('./utils/validate');
 const bcrypt = require("bcrypt");
+const cookieParser=require("cookie-parser");
+const jwt=require("jsonwebtoken");
+const {userAuth}=require("./middlewares/auth");
+const req = require('express/lib/request');
+
 const app=express();
 
 app.use(express.json());
+app.use(cookieParser());
 
 
 /*
@@ -54,16 +60,26 @@ app.post('/signup',async (req,res)=>{
 app.post('/signin',async (req,res)=>{
     try{
       const {emailId,password}=req.body;
-      const user=await findOne({emailId:emailId});
+      const user=await User.findOne({emailId:emailId});
       if(!user){
         throw new Error("Invalid Credentials!!!");
       }
-      const isPasswordValid=await bcrypt.compare(password,user.password);
+      const isPasswordValid=await user.passwordValidate(password);
+    //   console.log(isPasswordValid);
 
-      if(!isPasswordValid){
+      if(isPasswordValid){
+
+        const token=await user.getJWT();
+        // console.log(token);
+
+        res.cookie("Token",token,{expires: new Date(Date.now()+ 7*24*60*60*1000)});
+       
+        res.send("Login Successfull!!!");
+      }
+      else{
+        console.log(user);
         throw new Error("Invalid Credentials!!!");
       }
-      res.send("Login Successfull!!!");
     }
     catch(err){
         res.status(400).send("Error: " + err.message);
@@ -71,57 +87,23 @@ app.post('/signin',async (req,res)=>{
 
 });
 
-
-
-app.get("/feed",async (req,res)=>{
-    const data=await User.findOne({});
+app.get("/profile",userAuth, async (req,res)=>{
     try{
-        if(data.length===0){
-            res.status(400).send("No data found!!!");
-        }
-        else{
-            console.log(data);
-            res.status(200).send(data);
-        }
+
+        // console.log("logged in user is : " + user.firstName + " " + user.lastName);
+        const user=req.user;
+        // console.log(decodedValue);
+        res.send(user);
     }
     catch(err){
-        res.status(400).send("Error in fetching data!!!");
+        res.status(400).send("Error: " + err.message);
     }
-
 });
 
-app.delete('/deleteUser', async (req,res)=>{
-    console.log(req.body.firstName);
-    try{
+app.post("/sendConnection",userAuth,(req,res)=>{
 
-        const deleting=await User.deleteOne({firstName:req.body.firstName});
-        console.log(deleting);
-        res.send("deleted successfully!!!")
-    }
-    catch(err){
-        res.status(500).send("Something went worng while deleting data of user");
-    }
-})
-
-app.patch('/user', async (req,res)=>{
- 
-    const data=req.body;
-    const userId=req.body.userId;
-    try{
-        const Allowed_updates=["age","about","photoUrl","skills","password","gender"];
-        const isUpdateAllowed=Object.keys(data).every((k)=>Allowed_updates.includes(k));
-
-        const update=await User.findByIdAndUpdate(userId,data,{returnDocument:'before',runValidators:true});
-        if(data?.skills.length>100){
-         throw new Error("No more than 10 skills can be added!!!!");
-        }
-        console.log(update);
-        res.send(update);
-
-    }
-    catch(err){
-        res.status(400).send("Something went wrong while updating the data." + err.message);
-    }
+    const user=req.user;
+    res.send(user.firstName+ " sent the connection request.");
 
 });
 
