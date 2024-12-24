@@ -1,5 +1,5 @@
 const express=require('express');
-const {validateSignup}=require('../utils/validate');
+const {validateSignup,hashThePassword}=require('../utils/validate');
 const {User}=require('../model/user');
 const bcrypt = require("bcrypt");
 
@@ -11,10 +11,11 @@ authRouter.post('/signup',async (req,res)=>{
     // validation the data
     validateSignup(req);
 
-    const {firstName,lastName,emailId,password,age,gender}=req.body;
+    const {firstName,lastName,emailId,password,age,gender,skills,about}=req.body;
 
     //encrypt the password
-    const hashpassword =await bcrypt.hash(req.body.password,10);
+    
+    const hashpassword =await hashThePassword(password);    
     console.log(hashpassword);
 
     console.log(req.body);
@@ -27,12 +28,17 @@ authRouter.post('/signup',async (req,res)=>{
         emailId,
         password:hashpassword,
         age,
-        gender
+        gender,
+        skills,
+        about
 
     });
         if(user.skills?.length>10){
             throw new Error("No more than 10 skills can be added!!!!");
         }
+        if(user.about?.length>200){
+          throw new Error("Write your description in less than 200 characters.!!!!");
+      }
 
         await user.save();
         res.status(200).send("user Added successfully!!!");
@@ -59,7 +65,7 @@ authRouter.post('/signin',async (req,res)=>{
 
         res.cookie("Token",token,{expires: new Date(Date.now()+ 7*24*60*60*1000)});
        
-        res.send("Login Successfull!!!");
+        res.send(`${user.firstName} you are loggedin Successfully!!!`);
       }
       else{
         // console.log(user);

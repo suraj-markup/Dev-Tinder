@@ -60,10 +60,20 @@ const userSchema=new mongoose.Schema({
     },
     about:{
         type:String,
-        default:"This is a default description of user."
+        default:"This is a default description of user.",
+        validate(value){
+            if(value.lenght>200){
+                throw new Error("Write your description in less than 200 characters.")
+            }
+        }
     },
     skills:{
         type:[String],
+        validate(value){
+            if(value.lengt>5){
+                throw new Error("You can add upto 10 skills only.")
+            }
+        }
     }
 
 
@@ -75,7 +85,7 @@ const userSchema=new mongoose.Schema({
 userSchema.methods.getJWT=async function(){
 
     const user =this;
-    console.log(user);
+    // console.log(user);
     const token = await jwt.sign({_id:user._id},"secret",{expiresIn:"7d"});
     // console.log(token);
     return token;
@@ -85,6 +95,8 @@ userSchema.methods.getJWT=async function(){
 userSchema.methods.passwordValidate=async function(passwordByUser){
     const user=this;
     const hashPassword=user.password;
+    // console.log(passwordByUser);
+    //     console.log(user.password);
     const ispasswordValid=await bcrypt.compare(passwordByUser,hashPassword);
 
     return ispasswordValid;
