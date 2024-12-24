@@ -14,10 +14,10 @@
 - PATCH /profile/password
 
 3. ConnectionRequestRouter
-- POST /request/send/ignore/:userId
-- POST /request/send/interested/:userId
-- POST /request/review/accepted/:requestId
-- POST /request/review/rejected/:requestId
+- POST /request/send/:status/:userId
+    - :status=>ignored,interested
+- POST /request/review/:status/:requestId
+    - :status=>accepted,rejected
 
 4. UserRouter
 - GET /user/connections
