@@ -16,9 +16,9 @@ authRouter.post('/signup',async (req,res)=>{
     //encrypt the password
     
     const hashpassword =await hashThePassword(password);    
-    console.log(hashpassword);
+    // console.log(hashpassword);
 
-    console.log(req.body);
+    // console.log(req.body);
     //creating a new instance of the user model
     
     
