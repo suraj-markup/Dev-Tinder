@@ -20,8 +20,8 @@
     - :status=>accepted,rejected
 
 4. UserRouter
-- GET /user/connections
 - GET /user/requests/received
+- GET /user/connection
 - GET /user/feed  -gets you the profile of other users.
 
 

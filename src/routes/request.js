@@ -59,19 +59,7 @@ requestRouter.post("/request/send/:status/:userId",userAuth,async (req,res)=>{
     }
 
 });
-requestRouter.get("/request/review",userAuth,async(req,res)=>{
-    try{
-        const user=req.user;
 
-        const data=await ConnectionRequest.find({toUserId: user._id})
-        // console.log(data);
-        res.send(data);
-
-    }
-    catch(err){
-        res.status(400).send("Error: " + err.message);
-    }
-})
 
 requestRouter.post("/request/review/:status/:requestId",userAuth,async (req,res)=>{
     try{
