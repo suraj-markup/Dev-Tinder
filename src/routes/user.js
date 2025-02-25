@@ -103,6 +103,7 @@ userRouter.get("/feed",userAuth,async (req,res)=>{
         res.send(feedUsers);
 
     }
+    
     catch(err){
         res.status(400).send("ERROR: "+ err.message);
     }

@@ -13,10 +13,10 @@ const userAuth= async (req,res,next)=>{
     try{
         const cookies=req.cookies;
 
-        const token=cookies.Token;
-        // console.log(token);
+        const token=await cookies.Token;
+        // console.log(token,"         nvdnvldfbnldfkb");
         if(!token){
-            throw new Error("Invalid token please login first!!!");
+           return  res.status(401).send("Please Login");
         }
         const decodeValue=await jwt.verify(token,"secret");
         const {_id}=decodeValue;

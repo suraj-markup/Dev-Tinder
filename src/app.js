@@ -4,8 +4,14 @@ const bcrypt = require("bcrypt");
 const cookieParser=require("cookie-parser");
 const jwt=require("jsonwebtoken");
 const req = require('express/lib/request');
+const cors=require('cors');
 
 const app=express();
+
+app.use(cors({
+    origin: 'http://localhost:5173', // Allow requests from this origin
+    credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+  }));
 
 app.use(express.json());
 app.use(cookieParser());

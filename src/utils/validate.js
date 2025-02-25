@@ -4,7 +4,7 @@ const bcrypt=require('bcrypt');
 
 const validateSignup=(req)=>{
 
-    const {firstName,lastName,emailId,password,age,gender}=req.body;
+    const {firstName,lastName,emailId,password,age,gender,photoUrl}=req.body;
 
     if(!firstName){
         throw new Error("First name must be provided!!!");
